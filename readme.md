@@ -1,5 +1,10 @@
 # Mirth Connect Analyzer
 ## Install
+### From Source
+1. git clone https://github.com/MichaelLeeHobbs/mirth-connect-analyzer.git
+2. `yarn install` or `npm install`
+
+### From npm
 * todo `npm install -g mirth-connect-analyzer@latest`
 * todo `yarn global add mirth-connect-analyzer@latest`
 
