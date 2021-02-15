@@ -116,14 +116,17 @@ const checkScript = ({script, channelName, channelID, transformerType, transform
     })
 }
 
+// todo rename step to steps or something better
 const handleStep = ({step, channelName, channelID, transformerType, transformerStep}) => {
     if (!step[javaScriptStep]) return
 
-    step = step[javaScriptStep][0]
-    const transformerName = `${step.name?.[0] || ''}`
-    // console.log('step', transformerName, JSON.stringify(step, null, 2))
-    const {script: [script]} = step
-    checkScript({script, channelName, channelID, transformerType, transformerStep, transformerName})
+    const steps = step[javaScriptStep]
+    steps.forEach(step=>{
+        const transformerName = `${step.name?.[0] || ''}`
+        const {script: [script]} = step
+        checkScript({script, channelName, channelID, transformerType, transformerStep, transformerName})
+    })
+
 }
 
 const handleTransformer = ({transformer, channelName, channelID, transformerType}) => {
@@ -137,8 +140,8 @@ const handleTransformer = ({transformer, channelName, channelID, transformerType
 }
 
 const handleChannel = (channel) => {
-    const channelName = channel.name
-    const channelID = channel.id
+    const {name: [channelName]} = channel
+    const {id: [channelID]} = channel
 
     const [sourceConnector] = channel.sourceConnector
     const [sourceTransformer] = sourceConnector.transformer
@@ -155,31 +158,13 @@ const handleChannel = (channel) => {
 
     handleTransformer({transformer: sourceTransformer, channelName, channelID, transformerType: 'source'})
     destinationConnectors.connector.forEach(connector => {
-        connector.transformer.forEach(transformer => handleTransformer({transformer, channelName, channelID, transformerType: 'destination'}))
+        connector.transformer.forEach(transformer => {
+            handleTransformer({transformer, channelName, channelID, transformerType: 'destination'})
+        })
+        connector.responseTransformer.forEach(transformer => handleTransformer({transformer, channelName, channelID, transformerType: 'destinationResponseTransformer'}))
     })
 
 }
-
-// const main = async () => {
-//     // const xmlStr = await fs.readFile(__dirname + '/../data/Tests.xml', 'utf-8')
-//     // const xmlStr = await fs.readFile(__dirname + '/../data/RamSoft.xml', 'utf-8')
-//     const xmlStr = await fs.readFile(__dirname + '/../data/2021-02-15TRGMirthBackup.xml', 'utf-8')
-//     parser.parseString(xmlStr, function (err, result) {
-//         const {serverConfiguration} = result
-//         const {codeTemplateLibraries: [codeTemplateLibraries]} = serverConfiguration
-//         codeTemplateLibraries.codeTemplateLibrary?.forEach(codeTemplateLibrary => handleCodeTemplates(codeTemplateLibrary))
-//
-//         const {channels: [channels]} = serverConfiguration
-//         channels.channel.forEach((channel) => {
-//             // reset()
-//             handleChannel(channel)
-//         })
-//         // console.log('Done')
-//     })
-//     // console.log(xmlStr)
-// }
-
-
 
 module.exports = async (xml, outpath) => {
     const {serverConfiguration} = xml
