@@ -9,7 +9,7 @@
   "author": "Michael L. Hobbs <michael.lee.hobbs@gmail.com>",
   "license": "MIT",
   "keywords": [
-    "lifeplay"
+    "mirth connect"
   ],
   "dependencies": {
     "@types/yargs": "^15.0.9",
