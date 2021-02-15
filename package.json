@@ -1,0 +1,42 @@
+{
+  "name": "mirth-connect-analyzer",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaelleehobbs/mirth-connect-analyzer.git"
+  },
+  "author": "Michael L. Hobbs <michael.lee.hobbs@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "lifeplay"
+  ],
+  "dependencies": {
+    "@types/yargs": "^15.0.9",
+    "chokidar": "^3.4.3",
+    "directory-tree": "^2.2.5",
+    "fs-extra": "^9.0.1",
+    "uuid": "^8.3.1",
+    "winston": "^3.3.3",
+    "xml2js": "^0.4.23",
+    "yargs": "^16.1.0"
+  },
+  "bin": {
+    "mcAnalyzer": "./src/index.js"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.9"
+  },
+  "pkg": {
+    "targets": [
+      "node14"
+    ]
+  },
+  "scripts": {
+    "build:bin": "./node_modules/.bin/pkg src/index.js --output ./dist/lpBuilder-win-x64 --targets node14-win-x64 & ./node_modules/.bin/pkg src/index.js --output dist/lpBuilder-mac-x64 --targets node14-mac-x64 & ./node_modules/.bin/pkg src/index.js --output dist/0.5.8/lpBuilder-linux-x64 --targets node14-linux-x64",
+    "build:win": "./node_modules/.bin/pkg src/index.js --output ./dist/lpBuilder-win-x64 --targets node14-win-x64",
+    "build:linux": "./node_modules/.bin/pkg src/index.js --output dist/0.5.8/lpBuilder-linux-x64 --targets node14-linux-x64",
+    "build:mac": "./node_modules/.bin/pkg src/index.js --output dist/0.5.8/lpBuilder-mac-x64 --targets node14-mac-x64",
+    "test:manual": "node src build ./tests/Modules ./results"
+  }
+}
