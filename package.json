@@ -15,6 +15,7 @@
     "@types/yargs": "^15.0.9",
     "chokidar": "^3.4.3",
     "directory-tree": "^2.2.5",
+    "fast-csv": "^4.3.6",
     "fs-extra": "^9.0.1",
     "pkg": "^4.4.9",
     "uuid": "^8.3.1",
@@ -40,6 +41,10 @@
     "build:release:windows": "powershell \"wsl -d Ubuntu-20.04 ./scripts/release.sh\"",
     "do:release": "yarn version",
     "postversion:example": "git push --tags && yarn publish . --tag $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
-    "postversion": "git push --tags && git push"
+    "postversion": "git push --tags && git push",
+    "anaylze:local": "node src/index analyze ./data/MirthBackup.xml"
+  },
+  "devDependencies": {
+    "csv-to-markdown-table": "^1.1.0"
   }
 }

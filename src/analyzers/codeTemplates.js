@@ -1,5 +1,6 @@
 const fs = require('fs-extra')
-const resolvePath = require('../resolvePath')
+const resolvePath = require('../tools/resolvePath')
+const csvField = require('../tools/csvField')
 
 const javaScriptStep = "com.mirth.connect.plugins.javascriptstep.JavaScriptStep"
 const functionRegex = /function\s+(?<functionName>\w+)\(/
@@ -18,7 +19,13 @@ const addUsage = ({channelName, channelID, transformerType = '-', transformerSte
     codeTemplateFunctionsUsages.push([String(channelName), String(channelID), String(transformerType), String(transformerStep), String(transformerName), String(transformerLine), String(functionName), String(templateLibraryName), String(templateName), String(matcher), String(line)])
 }
 
-const csvField = (v) => `"${v}"`
+// const csvField = (v) => {
+//     // `"${String(v).startsWith('=') ? "'" : ""}${v}"`
+//     let str = String(v).trim()
+//     if (str.startsWith('=')) str = str.replace(/^=+/, '').trim()
+//     if (str.includes(',')) return `"${str}"`
+//     return str
+// }
 const codeTemplateFunctionsReport = (outpath) => {
     const report = [
         ['functionName', 'templateLibraryName', 'templateName', 'used', 'enabledChannelIds'],
@@ -28,13 +35,13 @@ const codeTemplateFunctionsReport = (outpath) => {
             report.push([k, templateLibraryName, templateName, used, enabledChannelIds.join(',')].map(csvField))
         })
     })
-    const csv = report.map(row => row.join(',')).join('\r\n')
-    fs.writeFileSync(resolvePath(`${outpath}/CodeTemplateChannelUsageReport.csv`), csv)
+    const csv = report.map(row => row.map(csvField).join(',')).join('\r\n')
+    fs.writeFileSync(resolvePath(`${outpath}/CodeTemplateReport.csv`), csv)
 }
 
 const codeTemplateUsageReport = (outpath) => {
-    const csv = codeTemplateFunctionsUsages.map(row => row.join(',')).join('\r\n')
-    fs.writeFileSync(resolvePath(`${outpath}/CodeTemplateUsageReport.csv`), csv)
+    const csv = codeTemplateFunctionsUsages.map(row => row.map(csvField).join(',')).join('\r\n')
+    fs.writeFileSync(resolvePath(`${outpath}/CodeTemplateByChannelUsage.csv`), csv)
 }
 
 const reset = () => codeTemplateFunctions.clear()
@@ -42,7 +49,7 @@ const reset = () => codeTemplateFunctions.clear()
 
 const addCodeTemplateFunction = ({functionName, templateID, templateName, enabledChannelIds = [], id, name}) => {
     const JS_KEY_WORDS = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof", "interface", "let", "new", "null", "package", "private", "protected", "public", "return", "super", "switch", "static", "this", "throw", "try", "true", "typeof", "var", "void", "while", "with", "yield"]
-    const ignoreList = ['split', 'replace', 'toString', 'keys', 'forEach', 'set', 'get']
+    const ignoreList = ['split', 'replace', 'toString', 'keys', 'forEach', 'set', 'get', 'match']
     if (JS_KEY_WORDS.includes(functionName)) return
     if (ignoreList.includes(functionName)) return
     enabledChannelIds = enabledChannelIds.map(ele => ele.trim())
@@ -56,6 +63,7 @@ const addCodeTemplateFunction = ({functionName, templateID, templateName, enable
 // options = {templateID, templateName, enabledChannelIds}
 const handleTemplateScript = (script, options) => {
     script.split('\n').forEach(line => {
+        if (line.trim().startsWith('//')) return
         let matches = functionRegex.exec(line)
         if (matches) {
             options.functionName = matches.groups.functionName
@@ -94,10 +102,13 @@ const checkScript = ({script, channelName, channelID, transformerType, transform
     channelID = String(channelID)
 
     codeTemplateFunctions.forEach((templateData, functionName) => {
-        const funcUseRegex = new RegExp(`[^.\\w]*${functionName}\\s*\\(`, '')
+        // const funcUseRegex = new RegExp(`[^.\\w]*${functionName}\\s*\\(`, '')
+        // const funcUseRegex = new RegExp(`[^.\\w]+${functionName}\\s*\\(`, '')
+        const funcUseRegex = new RegExp(`(?:[^.\\w]|^)+${functionName}\\s*\\(`, '')
         const funcAssignmentRegex = new RegExp(`[=]\\s*${functionName}[\\s|;]`)
 
         script.split('\n').forEach((line, i) => {
+            if (line.trim().startsWith('//')) return
             const matchA = funcUseRegex.exec(line)
             const matchB = funcAssignmentRegex.exec(line)
             const match = matchA || matchB
@@ -107,6 +118,9 @@ const checkScript = ({script, channelName, channelID, transformerType, transform
                         template.used = true
                         const matcher = matchA || matchB
                         const {templateLibraryName, templateName} = template
+                        if (matcher == 'n(') {
+                            console.log('matched n(', matchA, matchB)
+                        }
                         addUsage({channelName, channelID, functionName, templateLibraryName, templateName, transformerType, transformerStep, transformerName, transformerLine: i + 1, matcher, line})
                     }
                 })
@@ -121,7 +135,7 @@ const handleStep = ({step, channelName, channelID, transformerType, transformerS
     if (!step[javaScriptStep]) return
 
     const steps = step[javaScriptStep]
-    steps.forEach(step=>{
+    steps.forEach(step => {
         const transformerName = `${step.name?.[0] || ''}`
         const {script: [script]} = step
         checkScript({script, channelName, channelID, transformerType, transformerStep, transformerName})
