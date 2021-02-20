@@ -53,7 +53,7 @@ Listing of each code template function and if it appears to be used.
 4. After the analyzer finish check the report's folder.
 
 ## Changes
-### v0.1.5
+### v0.2.0
 * Fixed Report names
 * Fixed csv generation - escape each cell to avoid encoding issues
 * Fixed csv generation - #NAME? when starts with =
