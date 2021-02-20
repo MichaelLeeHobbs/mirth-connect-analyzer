@@ -1,6 +1,6 @@
 {
   "name": "mirth-connect-analyzer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -16,11 +16,11 @@
     "chokidar": "^3.4.3",
     "directory-tree": "^2.2.5",
     "fs-extra": "^9.0.1",
+    "pkg": "^4.4.9",
     "uuid": "^8.3.1",
     "winston": "^3.3.3",
     "xml2js": "^0.4.23",
-    "yargs": "^16.1.0",
-    "pkg": "^4.4.9"
+    "yargs": "^16.1.0"
   },
   "bin": {
     "mcAnalyzer": "./src/index.js"
@@ -38,6 +38,8 @@
     "build:mac": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer --targets node14-mac-x64",
     "build:release": "./scripts/release.sh",
     "build:release:windows": "powershell \"wsl -d Ubuntu-20.04 ./scripts/release.sh\"",
-    "do:release": "./scripts/release.sh"
+    "do:release": "yarn version",
+    "postversion:example": "git push --tags && yarn publish . --tag $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
+    "postversion": "git push --tags && git push"
   }
 }
