@@ -8,19 +8,23 @@ const fs = require('fs-extra')
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser()
 const codeTemplatesAnalyzer = require('./analyzers/codeTemplates')
+const listeners = require('./analyzers/listeners')
 
-const resolvePath = require('./resolvePath')
+const resolvePath = require('./tools/resolvePath')
 
 const main = async (configPath, outpath) => {
+    configPath = resolvePath(configPath)
+    console.log(`Analyzer starting. Analyzing: ${outpath}`)
     outpath = resolvePath(outpath)
     fs.ensureDirSync(outpath)
-    const xmlStr = await fs.readFile(resolvePath(configPath), 'utf-8')
+    const xmlStr = await fs.readFile(configPath, 'utf-8')
     parser.parseString(xmlStr, async (err, xml) => {
         if (err) {
             console.error(err)
             return
         }
         await codeTemplatesAnalyzer(xml, outpath)
+        await listeners(xml, outpath)
         console.log(`Analyze complete. Reports written to: ${outpath}`)
     })
 }
