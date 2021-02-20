@@ -32,27 +32,11 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Create Release
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install && yarn build:release
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - This is a test
-          draft: false
-          prerelease: false
-      - name: Upload Release Assets
-      - uses: actions/checkout@v2
       - run: |
           set -x
           assets=()
