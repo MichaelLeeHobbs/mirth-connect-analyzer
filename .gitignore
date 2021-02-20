@@ -200,3 +200,4 @@ build/
 data/
 reports/
 
+/dist/

@@ -19,13 +19,11 @@
     "uuid": "^8.3.1",
     "winston": "^3.3.3",
     "xml2js": "^0.4.23",
-    "yargs": "^16.1.0"
+    "yargs": "^16.1.0",
+    "pkg": "^4.4.9"
   },
   "bin": {
     "mcAnalyzer": "./src/index.js"
-  },
-  "devDependencies": {
-    "pkg": "^4.4.9"
   },
   "pkg": {
     "targets": [
@@ -33,9 +31,13 @@
     ]
   },
   "scripts": {
-    "build:bin": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer-win-x64 --targets node14-win-x64 & ./node_modules/.bin/pkg src/index.js --output dist/mcAnalyzer-mac-x64 --targets node14-mac-x64 & ./node_modules/.bin/pkg src/index.js --output dist/mcAnalyzer-linux-x64 --targets node14-linux-x64",
-    "build:win": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer-win-x64 --targets node14-win-x64",
-    "build:linux": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer-linux-x64 --targets node14-linux-x64",
-    "build:mac": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer-mac-x64 --targets node14-mac-x64"
+    "build:old": "./node_modules/.bin/pkg src/index.js --output ./dist/win/mcAnalyzer --targets node14-win-x64 & ./node_modules/.bin/pkg src/index.js --output dist/mac/mcAnalyzer --targets node14-mac-x64 & ./node_modules/.bin/pkg src/index.js --output dist/linux/mcAnalyzer --targets node14-linux-x64",
+    "build": "yarn build:win && yan build:linux && yarn build:mac",
+    "build:win": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer --targets node14-win-x64",
+    "build:linux": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer --targets node14-linux-x64",
+    "build:mac": "./node_modules/.bin/pkg src/index.js --output ./dist/mcAnalyzer --targets node14-mac-x64",
+    "build:release": "./scripts/release.sh",
+    "build:release:windows": "powershell \"wsl -d Ubuntu-20.04 ./scripts/release.sh\"",
+    "do:release": "./scripts/release.sh"
   }
 }
