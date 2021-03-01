@@ -94,7 +94,12 @@ const handleCodeTemplate = ({codeTemplate, enabledChannelIds, id, name}) => {
 
 const handleCodeTemplates = (codeTemplateLibrary) => {
     const {id: [id], name: [name], enabledChannelIds: [{string: enabledChannelIds} = _ids], codeTemplates: [codeTemplates]} = codeTemplateLibrary
-    codeTemplates.codeTemplate.forEach(codeTemplate => handleCodeTemplate({codeTemplate, enabledChannelIds, id, name}))
+    try {
+        codeTemplates.codeTemplate.forEach(codeTemplate => handleCodeTemplate({codeTemplate, enabledChannelIds, id, name}))
+    } catch (e) {
+        console.error(`Failed to parse code template!`, e)
+        console.debug(codeTemplateLibrary)
+    }
 }
 
 const checkScript = ({script, channelName, channelID, transformerType, transformerStep, transformerName}) => {
