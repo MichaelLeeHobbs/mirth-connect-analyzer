@@ -24,14 +24,22 @@ module.exports = async (xml, outPath) => {
     const {channels: [channels]} = serverConfiguration
     channels.channel.forEach((channel) => {
         const {id: [channelID], name: [channelName], sourceConnector: [sourceConnector]} = channel
+        console.log(`Processing Channel: ${channelName}`)
         const {properties: [properties]} = sourceConnector
         const connectorType = properties['$'].class?.split('.').pop()
-        const ignoreTypes = ['VmReceiverProperties', 'FileReceiverProperties', 'JavaScriptReceiverProperties']
+        // todo handle HttpReceiverProperties
+        const ignoreTypes = ['VmReceiverProperties', 'FileReceiverProperties', 'JavaScriptReceiverProperties', 'HttpReceiverProperties']
         // FileReceiverProperties
         // JavaScriptReceiverProperties
         if (ignoreTypes.includes(connectorType)) return
+        // if (!properties) {
+        //     console.log(`Processing Channel: ${channelName}  properties: undefined  ConnectorType: ${connectorType}`)
+        //     return
+        // }
+        // console.log(connectorType, properties)
         const {
-            listenerConnectorProperties: [listenerConnectorProperties], serverMode: [serverMode], remoteAddress: [remoteAddress], remotePort: [remotePort], overrideLocalBinding: [overrideLocalBinding],
+            listenerConnectorProperties: [listenerConnectorProperties],
+            serverMode: [serverMode], remoteAddress: [remoteAddress], remotePort: [remotePort], overrideLocalBinding: [overrideLocalBinding],
             reconnectInterval: [reconnectInterval], receiveTimeout: [receiveTimeout], bufferSize: [bufferSize], maxConnections: [maxConnections], keepConnectionOpen: [keepConnectionOpen], dataTypeBinary: [dataTypeBinary],
             charsetEncoding: [charsetEncoding], respondOnNewConnection: [respondOnNewConnection], responseAddress: [responseAddress], responsePort: [responsePort]
         } = properties
